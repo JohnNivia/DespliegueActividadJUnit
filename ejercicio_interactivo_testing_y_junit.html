@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taller Interactivo: Testing & JUnit en Java</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .code-font { font-family: 'Fira Code', monospace; }
+        .bg-grid {
+            background-size: 30px 30px;
+            background-image: linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen bg-grid flex flex-col">
+
+    <!-- Header / Navbar -->
+    <header class="border-b border-slate-800 bg-slate-950/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="bg-amber-500/10 border border-amber-500/30 p-2 rounded-lg text-amber-500">
+                    <i class="fa-solid fa-[#00a] fa-vial-circle-check text-2xl text-amber-400"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold bg-gradient-to-r from-amber-400 via-orange-300 to-emerald-400 bg-clip-text text-transparent">
+                        Desafío JUnit & Testing Java
+                    </h1>
+                    <p class="text-xs text-slate-400">Evaluación interactiva post-exposición ADSO SENA</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-6">
+                <div class="bg-slate-800/80 px-4 py-2 rounded-xl border border-slate-700 flex items-center gap-3">
+                    <i class="fa-solid fa-trophy text-yellow-400"></i>
+                    <div>
+                        <div class="text-xs text-slate-400 font-semibold uppercase">Puntaje Total</div>
+                        <div id="scoreDisplay" class="text-lg font-bold text-emerald-400">0 pts</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto px-4 py-8">
+
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-800 mb-8 overflow-x-auto gap-2">
+            <button onclick="switchTab('tab1')" id="btn-tab1" class="tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl border-b-2 border-emerald-500 bg-slate-800/80 text-emerald-400 flex items-center gap-2 transition">
+                <span class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 text-xs flex items-center justify-center font-bold">1</span>
+                Clasificación de Estados
+            </button>
+            <button onclick="switchTab('tab2')" id="btn-tab2" class="tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+                <span class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 text-xs flex items-center justify-center font-bold">2</span>
+                Completar el Código JUnit
+            </button>
+            <button onclick="switchTab('tab3')" id="btn-tab3" class="tab-btn px-5 py-3 font-semibold text-sm rounded-t-xl border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition">
+                <span class="w-6 h-6 rounded-full bg-slate-700 text-slate-300 text-xs flex items-center justify-center font-bold">3</span>
+                Simulador de Test Runner
+            </button>
+        </div>
+
+        <!-- TAB 1: Clasificación de Resultados -->
+        <section id="tab1" class="tab-content block space-y-6">
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-[#00a] fa-list-check text-emerald-400"></i>
+                        Nivel 1: Clasifica los Resultados de Ejecución
+                    </h2>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Determina si cada situación reportada por JUnit corresponde a un <strong class="text-emerald-400">Éxito (Green)</strong>, un <strong class="text-amber-400">Fallo (Failure)</strong> o un <strong class="text-rose-400">Error (Exception)</strong>.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-3 gap-4" id="classificationCards">
+                    <!-- Cards will be rendered dynamically via JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 2: Completar Código JUnit -->
+        <section id="tab2" class="tab-content hidden space-y-6">
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-code text-cyan-400"></i>
+                        Nivel 2: Detective de Código JUnit
+                    </h2>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Selecciona los elementos correctos (anotaciones e instrucciones de aserción) para hacer que las pruebas unitarias funcionen.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-2 gap-6">
+                    <!-- Desafío 1 -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20">Desafío A</span>
+                                <span class="text-xs text-slate-400">Sistema de Inventario</span>
+                            </div>
+                            <p class="text-sm text-slate-300 mb-4">
+                                Queremos verificar que el método <code class="code-font text-emerald-300 bg-slate-800 px-1.5 py-0.5 rounded">calcularTotal(5000, 3)</code> devuelva el valor esperado de <strong>15000</strong>.
+                            </p>
+
+                            <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 code-font text-xs text-slate-300 leading-relaxed overflow-x-auto mb-4">
+                                <div><span class="text-purple-400">import</span> org.junit.jupiter.api.Test;</div>
+                                <div><span class="text-purple-400">import static</span> org.junit.jupiter.api.Assertions.*;</div>
+                                <br>
+                                <div><span class="text-blue-400">class</span> <span class="text-yellow-300">InventarioTest</span> {</div>
+                                <div class="pl-4 mt-1">
+                                    <select id="q2a1" class="bg-slate-800 text-amber-300 border border-slate-600 rounded px-2 py-1 focus:outline-none focus:border-amber-400">
+                                        <option value="">-- Selecciona Anotación --</option>
+                                        <option value="@UnitTest">@UnitTest</option>
+                                        <option value="@Test">@Test</option>
+                                        <option value="@Execute">@Execute</option>
+                                    </select>
+                                </div>
+                                <div class="pl-4"><span class="text-blue-400">void</span> <span class="text-yellow-200">calculaTotal</span>() {</div>
+                                <div class="pl-8 text-slate-400">// Arrange & Act</div>
+                                <div class="pl-8">Inventario inv = <span class="text-purple-400">new</span> Inventario();</div>
+                                <div class="pl-8"><span class="text-blue-400">int</span> total = inv.calcularTotal(<span class="text-amber-300">5000</span>, <span class="text-amber-300">3</span>);</div>
+                                <div class="pl-8 text-slate-400">// Assert</div>
+                                <div class="pl-8 my-1">
+                                    <select id="q2a2" class="bg-slate-800 text-emerald-300 border border-slate-600 rounded px-2 py-1 focus:outline-none focus:border-emerald-400">
+                                        <option value="">-- Selecciona Assertion --</option>
+                                        <option value="assertEquals(total, 15000);">assertEquals(total, 15000);</option>
+                                        <option value="assertEquals(15000, total);">assertEquals(15000, total);</option>
+                                        <option value="assertValue(15000, total);">assertValue(15000, total);</option>
+                                    </select>
+                                </div>
+                                <div class="pl-4">}</div>
+                                <div>}</div>
+                            </div>
+                        </div>
+
+                        <button onclick="checkChallenge2A()" class="w-full bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-emerald-500/30 font-semibold py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Validar Desafío A
+                        </button>
+                        <div id="feedback2A" class="mt-3 text-xs hidden p-3 rounded-lg"></div>
+                    </div>
+
+                    <!-- Desafío 2 -->
+                    <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 bg-cyan-500/10 px-2.5 py-1 rounded-md border border-cyan-500/20">Desafío B</span>
+                                <span class="text-xs text-slate-400">Búsqueda de Productos</span>
+                            </div>
+                            <p class="text-sm text-slate-300 mb-4">
+                                Queremos verificar que al buscar un código existente <code class="code-font text-cyan-300 bg-slate-800 px-1.5 py-0.5 rounded">"P001"</code> el objeto retornado <strong>no sea nulo</strong>.
+                            </p>
+
+                            <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 code-font text-xs text-slate-300 leading-relaxed overflow-x-auto mb-4">
+                                <div><span class="text-purple-400">@Test</span></div>
+                                <div><span class="text-blue-400">void</span> <span class="text-yellow-200">buscarProductoExistente</span>() {</div>
+                                <div class="pl-4">Inventario inv = <span class="text-purple-400">new</span> Inventario();</div>
+                                <div class="pl-4">Producto p = inv.buscar(<span class="text-emerald-300">"P001"</span>);</div>
+                                <div class="pl-4 my-2">
+                                    <select id="q2b1" class="bg-slate-800 text-cyan-300 border border-slate-600 rounded px-2 py-1 focus:outline-none focus:border-cyan-400">
+                                        <option value="">-- Selecciona Assertion --</option>
+                                        <option value="assertExist(p);">assertExist(p);</option>
+                                        <option value="assertTrue(p != null);">assertTrue(p != null);</option>
+                                        <option value="assertNotNull(p);">assertNotNull(p);</option>
+                                    </select>
+                                </div>
+                                <div>}</div>
+                            </div>
+                        </div>
+
+                        <button onclick="checkChallenge2B()" class="w-full bg-slate-800 hover:bg-slate-700 text-cyan-400 border border-cyan-500/30 font-semibold py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-play"></i> Validar Desafío B
+                        </button>
+                        <div id="feedback2B" class="mt-3 text-xs hidden p-3 rounded-lg"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB 3: Simulador de Test Runner -->
+        <section id="tab3" class="tab-content hidden space-y-6">
+            <div class="bg-slate-800/40 border border-slate-700/60 rounded-2xl p-6">
+                <div class="mb-6">
+                    <h2 class="text-xl font-bold text-slate-100 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-emerald-400"></i>
+                        Nivel 3: Simulador de Test Runner JUnit
+                    </h2>
+                    <p class="text-sm text-slate-400 mt-1">
+                        Ejecuta la suite de pruebas del proyecto <code class="code-font text-amber-300">InventarioTest.java</code>. Inspecciona los errores, modifica el código del test si es necesario y logra que la barra de JUnit cambie a <strong>VERDE (Green)</strong>.
+                    </p>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-6">
+                    <!-- Panel Izquierdo: Editor de Pruebas -->
+                    <div class="lg:col-span-7 bg-slate-900 border border-slate-700 rounded-xl p-5">
+                        <div class="flex justify-between items-center mb-3 border-b border-slate-800 pb-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-file-code text-amber-400"></i>
+                                <span class="text-xs font-mono font-semibold text-slate-200">InventarioTest.java</span>
+                            </div>
+                            <span class="text-xs text-slate-400">JUnit 5 (Jupiter)</span>
+                        </div>
+
+                        <div class="bg-slate-950 p-4 rounded-lg border border-slate-800 code-font text-xs text-slate-200 leading-relaxed overflow-x-auto space-y-3">
+                            <div>
+                                <span class="text-purple-400">@Test</span><br>
+                                <span class="text-blue-400">void</span> <span class="text-yellow-200">testCalcularTotal</span>() {<br>
+                                <span class="pl-4">Inventario inv = <span class="text-purple-400">new</span> Inventario();</span><br>
+                                <span class="pl-4"><span class="text-blue-400">int</span> total = inv.calcularTotal(<span class="text-amber-300">5000</span>, <span class="text-amber-300">3</span>);</span><br>
+                                <span class="pl-4 text-slate-400">// Modifica el valor esperado para corregir el fallo:</span><br>
+                                <span class="pl-4">assertEquals(</span>
+                                <input id="simExpectedVal" type="number" value="12000" class="w-20 bg-slate-800 border border-slate-600 rounded px-1.5 py-0.5 text-amber-300 focus:outline-none focus:border-amber-400 text-center font-bold">
+                                <span>, total);</span><br>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="mt-4 flex gap-3">
+                            <button onclick="runJUnitSimulation()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-lg transition text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30">
+                                <i class="fa-solid fa-play"></i> Ejecutar Tests con JUnit
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Panel Derecho: Consola y Barra de JUnit -->
+                    <div class="lg:col-span-5 bg-slate-900 border border-slate-700 rounded-xl p-5 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-300 mb-3 flex items-center gap-2">
+                                <i class="fa-solid fa-[#00a] fa-gauge-high"></i> Estado del Test Runner
+                            </h3>
+
+                            <!-- Barra de Estado JUnit -->
+                            <div id="junitBar" class="h-4 w-full bg-slate-800 rounded-full overflow-hidden mb-4 border border-slate-700 transition-all duration-500">
+                                <div id="junitBarInner" class="h-full w-full bg-rose-500 transition-all duration-500"></div>
+                            </div>
+
+                            <div id="runnerStatusBox" class="bg-rose-500/10 border border-rose-500/30 rounded-lg p-3 text-xs mb-4">
+                                <div class="font-bold text-rose-400 flex items-center gap-2">
+                                    <i class="fa-solid fa-triangle-exclamation"></i> Estado: TESTS FALLANDO (Failures: 1)
+                                </div>
+                                <p class="text-slate-300 mt-1">El resultado obtenido no coincide con el valor esperado.</p>
+                            </div>
+
+                            <!-- Consola de Salida -->
+                            <div class="bg-slate-950 p-3 rounded-lg border border-slate-800 code-font text-[11px] text-slate-300 space-y-1">
+                                <div class="text-slate-500">// Console Output</div>
+                                <div id="consoleLine1" class="text-rose-400">org.opentest4j.AssertionFailedError:</div>
+                                <div id="consoleLine2" class="text-slate-300">Expected :<span id="expValText" class="text-amber-300">12000</span></div>
+                                <div id="consoleLine3" class="text-slate-300">Actual   :<span class="text-emerald-400">15000</span></div>
+                                <div id="consoleLine4" class="text-slate-500 mt-2">at InventarioTest.testCalcularTotal(InventarioTest.java:12)</div>
+                            </div>
+                        </div>
+
+                        <div id="simCompleteBadge" class="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-400 hidden">
+                            <i class="fa-solid fa-circle-check"></i> <strong>¡Felicidades!</strong> Lograste obtener la barra verde de JUnit.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Final Summary Modal / Banner -->
+        <div id="summaryCard" class="mt-8 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-6 hidden">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-bold text-white">¡Taller de Testing Completado!</h3>
+                        <p class="text-xs text-slate-300">Has demostrado un gran dominio sobre los conceptos de Testing y JUnit en Java.</p>
+                    </div>
+                </div>
+                <button onclick="resetAll()" class="bg-slate-700 hover:bg-slate-600 text-slate-200 px-4 py-2 rounded-lg text-sm font-semibold transition">
+                    Reiniciar Taller
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-800 bg-slate-950 py-4 text-center text-xs text-slate-500">
+        Testing y JUnit en Java &bull; ADSO SENA &bull; Recursos Educativos Interactivos
+    </footer>
+
+    <!-- Logic JS -->
+    <script>
+        // State management
+        let totalScore = 0;
+        let completedLevels = {
+            level1: false,
+            level2A: false,
+            level2B: false,
+            level3: false
+        };
+
+        const level1Data = [
+            {
+                id: 1,
+                title: "Simulación 1",
+                code: "expected: 15000\nactual: 15000",
+                desc: "El método retornó exactamente el valor planificado.",
+                options: ["Éxito", "Fallo", "Error"],
+                correct: "Éxito",
+                rationale: "¡Correcto! Cuando expected y actual coinciden, la prueba es un éxito (Green bar)."
+            },
+            {
+                id: 2,
+                title: "Simulación 2",
+                code: "expected: <15000>\nbut was: <12000>",
+                desc: "El método se ejecutó bien, pero retornó un valor distinto.",
+                options: ["Éxito", "Fallo", "Error"],
+                correct: "Fallo",
+                rationale: "¡Correcto! Es un Fallo (Failure) porque la lógica de negocio devolvió una respuesta incorrecta."
+            },
+            {
+                id: 3,
+                title: "Simulación 3",
+                code: "NullPointerException\nat Inventario.java:42",
+                desc: "Ocurrió una excepción no controlada al ejecutar el método.",
+                options: ["Éxito", "Fallo", "Error"],
+                correct: "Error",
+                rationale: "¡Correcto! Ocurrió un Error porque el código lanzó una excepción en tiempo de ejecución."
+            }
+        ];
+
+        // Tab Switching
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-emerald-500', 'bg-slate-800/80', 'text-emerald-400');
+                btn.classList.add('border-transparent', 'text-slate-400');
+            });
+
+            document.getElementById(tabId).classList.remove('hidden');
+            const activeBtn = document.getElementById('btn-' + tabId);
+            activeBtn.classList.add('border-emerald-500', 'bg-slate-800/80', 'text-emerald-400');
+            activeBtn.classList.remove('border-transparent', 'text-slate-400');
+        }
+
+        // Render Level 1
+        function renderLevel1() {
+            const container = document.getElementById('classificationCards');
+            container.innerHTML = '';
+
+            level1Data.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-900 border border-slate-700/80 rounded-xl p-4 flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="text-xs font-bold text-amber-400 uppercase tracking-wider mb-2">${item.title}</div>
+                        <p class="text-xs text-slate-300 mb-3">${item.desc}</p>
+                        <div class="bg-slate-950 p-2.5 rounded border border-slate-800 code-font text-[11px] text-slate-300 whitespace-pre-wrap mb-4">${item.code}</div>
+                    </div>
+                    <div>
+                        <div class="grid grid-cols-3 gap-2 mb-2" id="opts-${item.id}">
+                            ${item.options.map(opt => `
+                                <button onclick="checkLevel1(${item.id}, '${opt}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded py-1.5 text-xs font-semibold transition">
+                                    ${opt}
+                                </button>
+                            `).join('')}
+                        </div>
+                        <div id="feedback-l1-${item.id}" class="text-[11px] p-2 rounded hidden"></div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function checkLevel1(itemId, selected) {
+            const item = level1Data.find(d => d.id === itemId);
+            const feedbackEl = document.getElementById(`feedback-l1-${itemId}`);
+            
+            feedbackEl.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/30', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/30');
+            
+            if (selected === item.correct) {
+                feedbackEl.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-check mr-1"></i> ${item.rationale}`;
+                
+                if (!item.solved) {
+                    item.solved = true;
+                    addScore(100);
+                }
+            } else {
+                feedbackEl.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/30');
+                feedbackEl.innerHTML = `<i class="fa-solid fa-xmark mr-1"></i> Incorrecto. Vuelve a revisar los datos devueltos por JUnit.`;
+            }
+
+            checkOverallProgress();
+        }
+
+        // Level 2 Handlers
+        function checkChallenge2A() {
+            const q1 = document.getElementById('q2a1').value;
+            const q2 = document.getElementById('q2a2').value;
+            const feedback = document.getElementById('feedback2A');
+
+            feedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/30', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/30');
+
+            if (q1 === '@Test' && q2 === 'assertEquals(15000, total);') {
+                feedback.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> <strong>¡Excelente!</strong> Usaste @Test para anotar el método y assertEquals(esperado, actual) para verificar la salida.`;
+                if (!completedLevels.level2A) {
+                    completedLevels.level2A = true;
+                    addScore(150);
+                }
+            } else {
+                feedback.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/30');
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Revisa tus selecciones. Recuerda que la anotación en JUnit 5 es <code>@Test</code> y la sintaxis de la aserción es <code>assertEquals(esperado, actual)</code>.`;
+            }
+            checkOverallProgress();
+        }
+
+        function checkChallenge2B() {
+            const q1 = document.getElementById('q2b1').value;
+            const feedback = document.getElementById('feedback2B');
+
+            feedback.classList.remove('hidden', 'bg-emerald-500/10', 'text-emerald-400', 'border-emerald-500/30', 'bg-rose-500/10', 'text-rose-400', 'border-rose-500/30');
+
+            if (q1 === 'assertNotNull(p);') {
+                feedback.classList.add('bg-emerald-500/10', 'text-emerald-400', 'border', 'border-emerald-500/30');
+                feedback.innerHTML = `<i class="fa-solid fa-circle-check mr-1"></i> <strong>¡Correcto!</strong> <code>assertNotNull(p)</code> es la forma limpia y semántica en JUnit para comprobar que un objeto no sea nulo.`;
+                if (!completedLevels.level2B) {
+                    completedLevels.level2B = true;
+                    addScore(150);
+                }
+            } else {
+                feedback.classList.add('bg-rose-500/10', 'text-rose-400', 'border', 'border-rose-500/30');
+                feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i> Aunque comprobar p != null funciona, JUnit provee el método específico <code>assertNotNull(p)</code>.`;
+            }
+            checkOverallProgress();
+        }
+
+        // Level 3 Simulation
+        function runJUnitSimulation() {
+            const inputVal = parseInt(document.getElementById('simExpectedVal').value);
+            const barInner = document.getElementById('junitBarInner');
+            const statusBox = document.getElementById('runnerStatusBox');
+            const consoleLine1 = document.getElementById('consoleLine1');
+            const consoleLine2 = document.getElementById('consoleLine2');
+            const consoleLine3 = document.getElementById('consoleLine3');
+            const expValText = document.getElementById('expValText');
+            const badge = document.getElementById('simCompleteBadge');
+
+            expValText.textContent = inputVal;
+
+            if (inputVal === 15000) {
+                // PASS (GREEN BAR)
+                barInner.className = "h-full w-full bg-emerald-500 transition-all duration-500";
+                statusBox.className = "bg-emerald-500/10 border border-emerald-500/30 rounded-lg p-3 text-xs mb-4";
+                statusBox.innerHTML = `
+                    <div class="font-bold text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-check"></i> Estado: BUILD SUCCESSFUL (Tests: 1, Passed: 1)
+                    </div>
+                    <p class="text-slate-300 mt-1">Todas las aserciones han sido verificadas correctamente.</p>
+                `;
+
+                consoleLine1.className = "text-emerald-400 font-semibold";
+                consoleLine1.textContent = "BUILD SUCCESSFUL in 450ms";
+                consoleLine2.textContent = "InventarioTest > testCalcularTotal() PASSED";
+                consoleLine3.textContent = "1 test completed, 0 failed.";
+
+                badge.classList.remove('hidden');
+
+                if (!completedLevels.level3) {
+                    completedLevels.level3 = true;
+                    addScore(200);
+                }
+            } else {
+                // FAIL (RED BAR)
+                barInner.className = "h-full w-full bg-rose-500 transition-all duration-500";
+                statusBox.className = "bg-rose-500/10 border border-rose-500/30 rounded-lg p-3 text-xs mb-4";
+                statusBox.innerHTML = `
+                    <div class="font-bold text-rose-400 flex items-center gap-2">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Estado: TESTS FALLANDO (Failures: 1)
+                    </div>
+                    <p class="text-slate-300 mt-1">El resultado obtenido no coincide con el valor esperado.</p>
+                `;
+
+                consoleLine1.className = "text-rose-400";
+                consoleLine1.textContent = "org.opentest4j.AssertionFailedError:";
+                consoleLine2.innerHTML = `Expected :<span class="text-amber-300">${inputVal}</span>`;
+                consoleLine3.innerHTML = `Actual   :<span class="text-emerald-400">15000</span>`;
+
+                badge.classList.add('hidden');
+            }
+
+            checkOverallProgress();
+        }
+
+        function addScore(pts) {
+            totalScore += pts;
+            document.getElementById('scoreDisplay').textContent = totalScore + " pts";
+        }
+
+        function checkOverallProgress() {
+            const allL1Solved = level1Data.every(d => d.solved);
+            if (allL1Solved && completedLevels.level2A && completedLevels.level2B && completedLevels.level3) {
+                document.getElementById('summaryCard').classList.remove('hidden');
+            }
+        }
+
+        function resetAll() {
+            totalScore = 0;
+            completedLevels = { level1: false, level2A: false, level2B: false, level3: false };
+            level1Data.forEach(d => d.solved = false);
+            document.getElementById('scoreDisplay').textContent = "0 pts";
+            document.getElementById('summaryCard').classList.add('hidden');
+            renderLevel1();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            renderLevel1();
+        };
+    </script>
+</body>
+</html>
